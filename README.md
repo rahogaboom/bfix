@@ -1,6 +1,14 @@
 
 A Generic API for Bit Manipulation in C - C/C++
-   - 
+   - insert(bfi()) or extract(bfx()) bit fields from an unsigned char array of arbitrary length
+   - offset bit numbers are from 1(start of array) to unlimited
+   - can handle 32 or 64 bit machines
+   - use big endian if BFIX_BIG_ENDIAN set, use little endian if BFIX_LITTLE_ENDIAN set,
+     otherwise do run time checking
+   - bit fields inserted/extracted can be from <=32/64 to 25/57 depending on the offset bit
+     number from the beginning of the array(see bfix.c Notes for details)
+   - caveat: always make the unsigned char array 3(32 bit machines) or 7(64 bit machines) bytes
+     longer to prevent read/write of bits beyond the logical end of array(see bfix.c Notes for details)
 
 API:
 
