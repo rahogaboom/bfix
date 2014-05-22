@@ -1,5 +1,5 @@
 
-Bit Field Insertion and Extraction(bfix)
+A Generic API for Bit Manipulation in C - C/C++
    - 
 
 API:
@@ -63,9 +63,8 @@ bfx(
     unsigned long bit_len)
 
 Common Usage:
-
-Insert bit fields:
-   bfi(cp, 1, 1, 0); # in unsigned char array cp set bit 1 to 0
-Extract bit fields:
-   i = bfx(cp, 1, 2); # in unsigned char array cp extracts two bit field starting at bit 1 and sets i
+   Insert bit fields:
+      bfi(cp, 1, 1, 0); # in unsigned char array cp set bit 1 to 0
+   Extract bit fields:
+      i = bfx(cp, 1, 2); # in unsigned char array cp extracts two bit field starting at bit 1 and sets i
 ```
