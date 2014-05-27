@@ -7,6 +7,7 @@ A Generic API for Bit Manipulation in C - C/C++
      otherwise do run time checking
    - bit fields inserted/extracted can be from <=32/64 to 25/57 depending on the offset bit
      number from the beginning of the array(see bfix.c Notes for details)
+   - see article in Embedded Systems Programming, Jul. 1999, "A Generic API for Bit Manipulation in C"(included)
    - caveat: always make the unsigned char array 3(32 bit machines) or 7(64 bit machines) bytes
      longer to prevent read/write of bits beyond the logical end of array(see bfix.c Notes for details)
 
