@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "bfix.h"
+#include "bfix.hpp"
 
 
    int

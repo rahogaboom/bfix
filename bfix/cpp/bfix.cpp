@@ -1,12 +1,10 @@
 /*
- *======================================================================================================================
  * File: bfix.c
  *
  * Description:
  *     These routines are used to insert and extract bit fields from an array of characters pointed to by an unsigned
  *     char* pointer.
  *
- *======================================================================================================================
  */
 
 /*
@@ -46,56 +44,16 @@
  *        bfix.h then that particular behavior will be compiled in.
  */
 
-/*
- *----------------------------------------------------------------------------------------------------------------------
- * include files
- *----------------------------------------------------------------------------------------------------------------------
- */
-
 #include <stdio.h>
 #include <string.h>
 
-#include "bfix.h"
-
-/*
- *----------------------------------------------------------------------------------------------------------------------
- * constants
- *----------------------------------------------------------------------------------------------------------------------
- */
+#include "bfix.hpp"
 
 /* comment in one of these for compiled in endianness - default to run time endian check */
 /* #define BFIX_BIG_ENDIAN */
 /* #define BFIX_LITTLE_ENDIAN */
 
 /*
- *----------------------------------------------------------------------------------------------------------------------
- * data types
- *----------------------------------------------------------------------------------------------------------------------
- */
-
-/*
- *----------------------------------------------------------------------------------------------------------------------
- * global variables
- *----------------------------------------------------------------------------------------------------------------------
- */
-
-/*
- *----------------------------------------------------------------------------------------------------------------------
- * local function prototypes
- *----------------------------------------------------------------------------------------------------------------------
- */
-
-/*
- *----------------------------------------------------------------------------------------------------------------------
- * functions
- *----------------------------------------------------------------------------------------------------------------------
- */
-
-
-
-
-/*
- *----------------------------------------------------------------------------------------------------------------------
  * bfi:
  *     bit field insertion
  *
@@ -112,7 +70,6 @@
  * Returns:
  *     None if !BFIX_DEBUG
  *     int 1 if fail and 0 on success
- *----------------------------------------------------------------------------------------------------------------------
  */
 
 #ifdef BFIX_DEBUG
@@ -305,7 +262,6 @@ bfi(
 
 
 /*
- *------------------------------------------------------------------------------
  * bfx:
  *     bit field extraction
  *
@@ -320,7 +276,6 @@ bfi(
  *
  * Returns:
  *     on success unsigned long extracted bit field, 0 on failure
- *------------------------------------------------------------------------------
  */
 
     unsigned long
@@ -335,10 +290,6 @@ bfx(
     unsigned int BITS_PER_LONG;
 
     unsigned long l;
-
-    #if !defined(BFIX_BIG_ENDIAN) && !defined(BFIX_LITTLE_ENDIAN)
-    unsigned long m;
-    #endif
 
     #if !defined(BFIX_BIG_ENDIAN)
     unsigned int i, j, size;
@@ -405,8 +356,10 @@ bfx(
 
     /* move BYTES_PER_LONG bytes to tmp storage */
     #if defined(BFIX_BIG_ENDIAN)
+        /* compiled in big endian */
         memmove((unsigned char *)&l, &cptr[byte_offset], BYTES_PER_LONG);
     #elif defined(BFIX_LITTLE_ENDIAN)
+        /* compiled in little endian */
         memmove((unsigned char *)&l, &cptr[byte_offset], BYTES_PER_LONG);
         size = sizeof(l);
         for (i=0;i < size/2; i++)
@@ -417,12 +370,11 @@ bfx(
             c[j] = tmp;
         }
     #else
-        m = l;
+        /* compiled in run time endian checking */
         l = 1;
         if (c[0])
         {
             /* little endian */
-            l = m;
             memmove((unsigned char *)&l, &cptr[byte_offset], BYTES_PER_LONG);
             size = sizeof(l);
             for (i=0;i < size/2; i++)
@@ -436,7 +388,6 @@ bfx(
         else
         {
             /* big endian */
-            l = m;
             memmove((unsigned char *)&l, &cptr[byte_offset], BYTES_PER_LONG);
         }
     #endif
