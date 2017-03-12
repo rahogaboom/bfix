@@ -31,12 +31,12 @@
 //
 
 /*
- *======================================================================================================================
+ *==================================================================================================
  *
  * File Name:
  *     bfix.cpp
  *
- *======================================================================================================================
+ *==================================================================================================
  *
  * Functions:
  *
@@ -65,66 +65,90 @@
  *         )
  *         e.g. unsigned long l = bfx(cptr, bit_offset, bit_len);
  *
- *======================================================================================================================
+ *==================================================================================================
  *
  * Description:
  *
- *     bfi()/bfx() are used to insert and extract bit fields from an arbitrary length array of unsigned
- *     chars pointed to by an unsigned char* pointer.
+ *     bfi()/bfx() are used to insert and extract bit fields from an arbitrary length array
+ *     of unsigned chars pointed to by an unsigned char* pointer.
  *
- *======================================================================================================================
+ *==================================================================================================
  *
  * Error Handling
  *
  *     1. Exceptions - None
  *     2. Debugging  - define BFIX_DEBUG for debugging output
- *     3. Returns    - bfi(): if defined BFIX_DEBUG, returns 0 on success and -1 on error
- *                     bfx(): if defined BFIX_DEBUG, returns value on success and -1 on error
- *                     bfx(): if not defined BFIX_DEBUG, returns value on success and -1 on error
+ *     3. Returns
  *
- *======================================================================================================================
+ *            bfi():
+ *                if defined BFIX_DEBUG:
+ *                    bit_offset < 1     - error, return -1
+ *                    bit_len < 1        - error, return -1
+ *                    bit_len > too long - error, return -1
+ *                    return 0           - success
+ *                if not defined BFIX_DEBUG:
+ *                    void
+ *
+ *            bfx():
+ *                if defined BFIX_DEBUG:
+ *                    bit_offset < 1     - error, return -1
+ *                    bit_len < 1        - error, return -1
+ *                    bit_len > too long - error, return -1
+ *                    return bit field   - success
+ *                if not defined BFIX_DEBUG:
+ *                    bit_len < 1        - error, return -1
+ *                    return bit field   - success
+ *
+ *==================================================================================================
  *
  * Notes:
- *     1. in the following notes any annotation of the form n/m means n for 32 bit systems and m for 64 bit systems.
- *        operation on 32 or 64 bit systems should be transparent.
+ *     1. in the following notes any annotation of the form n/m means n for 32 bit systems and
+ *        m for 64 bit systems.  operation on 32 or 64 bit systems should be transparent.
  *
- *     2. normally, no checking for reasonable argument values is done.  if BFIX_DEBUG is defined then reasonable
- *        values for bit_offset and bit_len are checked.  a reasonable value for bit_len is dependent on the starting
- *        bit_offset value as explained in note 3.  a check if both BFIX_BIG_ENDIAN and BFIX_LITTLE_ENDIAN are
- *        defined at the same time is made.  see the code for BFIX_DEBUG inclusions.
+ *     2. normally, no checking for reasonable argument values is done.  if BFIX_DEBUG is defined
+ *        then reasonable values for bit_offset and bit_len are checked.  a reasonable value for
+ *        bit_len is dependent on the starting bit_offset value as explained in note 3.  a check
+ *        if both BFIX_BIG_ENDIAN and BFIX_LITTLE_ENDIAN are defined at the same time is made.
+ *        see the code for BFIX_DEBUG inclusions.
  *
- *     3. bit_len should be <=32/64 to 25/57. it depends on the value of bit_offset.  the method always uses a memmove()
- *        of 4/8 bytes to a long temporary storage in which logical operations can be performed.  this means that the
- *        bit_len can be at most 4/8 bytes, but in a case in which the start bit is not at the beginning of a byte,
- *        then the bit_len can only extend until the end of the 4/8'th byte.  if the start bit is the last bit of a
- *        byte this will limit bit_len to 25/57 bits - the last bit of the first byte plus the next 3/7 bytes.
- *        a bit_len of zero is ok - with bfx() returning 0 and bfi() inserting nothing.
+ *     3. bit_len should be <=32/64 to 25/57. it depends on the value of bit_offset.  the method
+ *        always uses a memmove() of 4/8 bytes to a long temporary storage in which logical
+ *        operations can be performed.  this means that the bit_len can be at most 4/8 bytes,
+ *        but in a case in which the start bit is not at the beginning of a byte, then the
+ *        bit_len can only extend until the end of the 4/8'th byte.  if the start bit is the
+ *        last bit of a byte this will limit bit_len to 25/57 bits - the last bit of the first
+ *        byte plus the next 3/7 bytes.  a bit_len of zero is ok - with bfx() returning 0 and
+ *        bfi() inserting nothing.
  *
  *     4. and bit_offset+bit_len should not overrun the array.
  *
- *     5. value should not be too long to fit into the bit field.  if it is, the high order bits in front of the low
- *        order bit_len bits will be truncated.
+ *     5. value should not be too long to fit into the bit field.  if it is, the high order bits
+ *        in front of the low order bit_len bits will be truncated.
  *
  *     6. all bit_len bits will be set and no bit outside the bit field will be changed.
  *
- *     7. value may be negative and prefix 2's complement sign bits are truncated to fit into bit_len bits.
+ *     7. value may be negative and prefix 2's complement sign bits are truncated to fit into
+ *        bit_len bits.
  *
- *     8. 4/8 bytes are always read from the unsigned char array, modified and then written back.  this means that if
- *        you set the last bit of the array, then the next 3/7 bytes will be read and written back, thus seemingly
- *        overrunning the array.  this may or may not be a problem.  if the 4/8 bytes does not overrun the array
- *        then no bits beyond the end of the array will be changed.  if the 4/8 bytes does overrun the array
- *        some provision must be made to deal with this possibility.  the array could be padded by 3/7 extra bytes.
+ *     8. 4(32 bit machines)/8(64 bit machines) bytes are always read from the unsigned char
+ *        array, modified and then written back.  this means that if you set the last bit of
+ *        the array, then the next 3/7 bytes will be read and written back, thus seemingly
+ *        overrunning the array.  if the 4/8 bytes does not overrun the array then no bits
+ *        beyond the end of the array will be changed.  if the 4/8 bytes does overrun the
+ *        array some provision must be made to deal with this possibility.  the array could
+ *        be padded by 3/7 extra bytes.
  *
- *     9. there are three ways to handle endianness.  by default endianness is determined at run time.  this, however,
- *        introduces some run time penalty.  if BFIX_BIG_ENDIAN or BFIX_LITTLE_ENDIAN(but not both) is defined in
- *        bfix.h then that particular behavior will be compiled in.
+ *     9. there are three ways to handle endianness.  by default endianness is determined at run
+ *        time.  this, however, introduces some run time penalty.  if BFIX_BIG_ENDIAN or
+ *        BFIX_LITTLE_ENDIAN(but not both) is defined in bfix.h then that particular behavior
+ *        will be compiled in.
  *
- *======================================================================================================================
+ *==================================================================================================
  *
  * Author: Richard Hogaboom
  *         richard.hogaboom@gmail.com
  *
- *======================================================================================================================
+ *==================================================================================================
  */
 
 #include <cstring>
@@ -139,7 +163,7 @@
 /* #define BFIX_LITTLE_ENDIAN */
 
 /*
- *======================================================================================================================
+ *==================================================================================================
  *     bfi()
  *
  * Purpose: 
@@ -156,8 +180,13 @@
  *         int return = bfi(cptr, bit_offset, bit_len, value);
  *
  * Returns:
- *     1. void
- *     2. if defined BFIX_DEBUG, 0 on success and -1 on error
+ *     if defined BFIX_DEBUG:
+ *         bit_offset < 1     - error, return -1
+ *         bit_len < 1        - error, return -1
+ *         bit_len > too long - error, return -1
+ *         return 0           - success
+ *     if not defined BFIX_DEBUG:
+ *         void
  *
  * Parameters:
  *     unsigned char *cptr      - pointer to unsigned char array
@@ -166,6 +195,13 @@
  *     unsigned long value      - value to insert
  *
  * Comments:
+ *     4(32 bit machines)/8(64 bit machines) bytes are always read from the unsigned char
+ *     array, modified and then written back.  this means that if you set the last bit of
+ *     the array, then the next 3/7 bytes will be read and written back, thus seemingly
+ *     overrunning the array.  if the 4/8 bytes does not overrun the array then no bits
+ *     beyond the end of the array will be changed.  if the 4/8 bytes does overrun the
+ *     array some provision must be made to deal with this possibility.  the array could
+ *     be padded by 3/7 extra bytes.
  */
 
 #ifdef BFIX_DEBUG
@@ -192,8 +228,10 @@ bfi
     unsigned long m;
     #endif
 
+    unsigned int i;
+
     #if !defined(BFIX_BIG_ENDIAN)
-    unsigned int i, j, size;
+    unsigned int j, size;
     unsigned char* c = (unsigned char*)&l;
     unsigned char tmp;
     #endif
@@ -206,7 +244,7 @@ bfi
 
     BYTES_PER_LONG = sizeof(unsigned long);
     BITS_PER_LONG = BYTES_PER_LONG * BITS_PER_BYTE;
-    for (i=0 ; i<BYTES_PER_LONG ; i++)
+    for ( i=0 ; i<BYTES_PER_LONG ; i++ )
     {
        ((unsigned char *)&mask)[i] = 0xff;
     }
@@ -216,15 +254,15 @@ bfi
             #error bfi(): Both BFIX_BIG_ENDIAN and BFIX_LITTLE_ENDIAN defined at the same time.
         #endif
 
-        if (bit_offset < 1)
+        if ( bit_offset < 1 )
         {
             fprintf(stderr, "bfi: arg #2, bit_offset = %ld is < 1.\n", bit_offset);
             return -1;
         }
 
-        if (bit_len <= 0)
+        if ( bit_len < 1 )
         {
-            fprintf(stderr, "bfi: arg #3, bit_len = %ld is <= 0.\n", bit_len);
+            fprintf(stderr, "bfi: arg #3, bit_len = %ld is < 1.\n", bit_len);
             return -1;
         }
     #endif
@@ -242,7 +280,7 @@ bfi
     pre_shift = bit_offset - byte_offset*BITS_PER_BYTE - 1;
 
     #ifdef BFIX_DEBUG
-        if (bit_len > (BITS_PER_LONG-pre_shift))
+        if ( bit_len > (BITS_PER_LONG-pre_shift) )
         {
             fprintf(stderr, "bfi: arg #3, bit_len = %ld to long.\n", bit_len);
             return -1;
@@ -277,7 +315,7 @@ bfi
     #if defined(BFIX_BIG_ENDIAN)
     #elif defined(BFIX_LITTLE_ENDIAN)
         size = sizeof(l);
-        for (i=0;i < size/2; i++)
+        for ( i=0 ; i < size/2; i++ )
         {
             j = size - i - 1;
             tmp = c[i];
@@ -292,7 +330,7 @@ bfi
             /* little endian */
             l = m;
             size = sizeof(l);
-            for (i=0;i < size/2; i++)
+            for ( i=0 ; i < size/2; i++ )
             {
                 j = size - i - 1;
                 tmp = c[i];
@@ -313,7 +351,7 @@ bfi
     #if defined(BFIX_BIG_ENDIAN)
     #elif defined(BFIX_LITTLE_ENDIAN)
         size = sizeof(l);
-        for (i=0;i < size/2; i++)
+        for ( i=0 ; i < size/2; i++ )
         {
             j = size - i - 1;
             tmp = c[i];
@@ -328,7 +366,7 @@ bfi
             /* little endian */
             l = m;
             size = sizeof(l);
-            for (i=0;i < size/2; i++)
+            for ( i=0 ; i < size/2; i++ )
             {
                 j = size - i - 1;
                 tmp = c[i];
@@ -353,7 +391,7 @@ bfi
 
 
 /*
- *======================================================================================================================
+ *==================================================================================================
  *     bfx()
  *
  * Purpose: 
@@ -367,7 +405,15 @@ bfi
  *     unsigned long l = bfx(cptr, bit_offset, bit_len);
  *
  * Returns:
- *     1. unsigned long - value if success and -1 on failure
+ *     bfx():
+ *         if defined BFIX_DEBUG:
+ *             bit_offset < 1     - error, return -1
+ *             bit_len < 1        - error, return -1
+ *             bit_len > too long - error, return -1
+ *             return bit field   - success
+ *         if not defined BFIX_DEBUG:
+ *             bit_len < 1        - error, return -1
+ *             return bit field   - success
  *
  * Parameters:
  *     const unsigned char *cptr - pointer to unsigned char array
@@ -411,20 +457,20 @@ bfx
             #error bfx(): Both BFIX_BIG_ENDIAN and BFIX_LITTLE_ENDIAN defined at the same time.
         #endif
 
-        if (bit_offset < 1)
+        if ( bit_offset < 1 )
         {
             fprintf(stderr, "bfx: arg #2, bit_offset < 1.\n");
             return -1;
         }
 
-        if (bit_len <= 0)
+        if ( bit_len < 1 )
         {
-            fprintf(stderr, "bfx: arg #3, bit_len <= 0.\n");
+            fprintf(stderr, "bfx: arg #3, bit_len < 1.\n");
             return -1;
         }
     #endif
 
-    if (bit_len == 0)
+    if ( bit_len < 1 )
     {
        return -1;
     }
@@ -442,7 +488,7 @@ bfx
     left_shift = bit_offset - byte_offset*BITS_PER_BYTE - 1;
 
     #ifdef BFIX_DEBUG
-        if (bit_len > (BITS_PER_LONG-left_shift))
+        if ( bit_len > (BITS_PER_LONG-left_shift) )
         {
             fprintf(stderr, "bfx: arg #3, bit_len to long.\n");
             return -1;
@@ -463,7 +509,7 @@ bfx
         /* compiled in little endian */
         memmove((unsigned char *)&l, &cptr[byte_offset], BYTES_PER_LONG);
         size = sizeof(l);
-        for (i=0;i < size/2; i++)
+        for ( i=0 ; i < size/2; i++ )
         {
             j = size - i - 1;
             tmp = c[i];
@@ -478,7 +524,7 @@ bfx
             /* little endian */
             memmove((unsigned char *)&l, &cptr[byte_offset], BYTES_PER_LONG);
             size = sizeof(l);
-            for (i=0;i < size/2; i++)
+            for ( i=0 ; i < size/2; i++ )
             {
                 j = size - i - 1;
                 tmp = c[i];

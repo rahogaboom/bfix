@@ -2,9 +2,10 @@
  * test program for bfi() and bfx()
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstring>
+#include <cstdio>
+#include <cstdlib>
+#include <iostream>
 
 #include "bfix.hpp"
 
