@@ -143,6 +143,12 @@
  *        BFIX_LITTLE_ENDIAN(but not both) is defined in bfix.h then that particular behavior
  *        will be compiled in.
  *
+ *    10. use the lscpu cmd to determine 32/64 bit and endianness:
+ *        $ lscpu
+ *        Architecture:          x86_64
+ *        CPU op-mode(s):        32-bit, 64-bit
+ *        Byte Order:            Little Endian
+ *
  *==================================================================================================
  *
  * Author: Richard Hogaboom
