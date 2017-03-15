@@ -41,25 +41,23 @@
  *
  */
 
-#ifdef BFIX_DEBUG
     int
-#else
-    void
-#endif
 bfi
     (
         unsigned char *cptr,
         unsigned long bit_offset,
         unsigned long bit_len,
-        long value
+        long value,
+        unsigned int endian
     );
 
-    unsigned long
+    long
 bfx
     (
         const unsigned char *cptr,
         unsigned long bit_offset,
-        unsigned long bit_len
+        unsigned long bit_len,
+        unsigned int endian
     );
 
 #endif /* BFIX_HPP */

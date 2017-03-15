@@ -13,22 +13,19 @@ then
     rm -f libbfix.so
     rm -f libbfix.so.1
     rm -f libbfix.so.1.0.1
+    rm -f scan-build.bfix.cpp.sa
     exit
 fi
 
 # pick compiler
-#CC="clang"
-#CC="clang++"
-#CC="gcc"
-CC="g++"
+CC="clang++"
+#CC="g++"
 
 # pick language dialect
-#LD="c11"
 #LD="c++11"
-#LD="gnu11"
+LD="c++14"
 #LD="gnu++11"
-#LD="c++14"
-LD="gnu++14"
+#LD="gnu++14"
 
 # pick debug/optimize
 O=g
@@ -56,4 +53,7 @@ $CC -std=$LD -$O -ansi -pedantic -Wall -o bfix_test bfix_test.cpp -L. -lbfix -lm
 
 # run test program
 ./bfix_test 2> bfix_test.results
+
+# do LLVM scan-build static analysis
+scan-build clang++ -c bfix.cpp > scan-build.bfix.cpp.sa 2>&1
 
