@@ -74,19 +74,21 @@
  * Error Handling
  *
  *     1. Exceptions - None
- *     2. Debugging  - define DEBUG for debugging output
+ *     2. Debugging  - const int DEBUG = true for debugging output
  *     3. Returns
  *
  *            bfi():
  *                bit_offset < 1     - error, return -1
  *                bit_len < 1        - error, return -2
  *                bit_len > too long - error, return -3
+ *                endian not 0-2     - error, return -4
  *                return 0           - success
  *
  *            bfx():
  *                bit_offset < 1     - error, return -1
  *                bit_len < 1        - error, return -2
  *                bit_len > too long - error, return -3
+ *                endian not 0-2     - error, return -4
  *                return bit field   - success
  *
  *==================================================================================================
@@ -138,8 +140,11 @@
 
 #include <cstring>
 #include <cstdio>
+#include <iostream>
 
 #include "bfix.hpp"
+
+using std::cerr;
 
 const bool DEBUG = true;
 
@@ -221,7 +226,7 @@ bfi
     {
         if ( DEBUG == true )
         {
-            fprintf(stderr, "bfi: bit_offset = %ld is < 1.\n", bit_offset);
+            cerr << "bfi: bit_offset = " << bit_offset << " is < 1.\n";
         }
         return -1;
     }
@@ -230,7 +235,7 @@ bfi
     {
         if ( DEBUG == true )
         {
-            fprintf(stderr, "bfi: bit_len = %ld is < 1.\n", bit_len);
+            cerr << "bfi: bit_len = " << bit_len << " is < 1.\n";
         }
         return -2;
     }
@@ -251,7 +256,7 @@ bfi
     {
         if ( DEBUG == true )
         {
-            fprintf(stderr, "bfi: bit_len = %ld to long.\n", bit_len);
+            cerr << "bfi: bit_len = " << bit_len << " is too long.\n";
         }
         return -3;
     }
@@ -446,7 +451,7 @@ bfx
     {
         if ( DEBUG == true )
         {
-            fprintf(stderr, "bfx: bit_offset = %ld is < 1.\n", bit_offset);
+            cerr << "bfx: bit_offset = " << bit_offset << " is < 1.\n";
         }
         return -1;
     }
@@ -455,7 +460,7 @@ bfx
     {
         if ( DEBUG == true )
         {
-            fprintf(stderr, "bfx: bit_len = %ld is < 1.\n", bit_len);
+            cerr << "bfx: bit_len = " << bit_len << " is < 1.\n";
         }
         return -2;
     }
@@ -476,7 +481,7 @@ bfx
     {
         if ( DEBUG == true )
         {
-            fprintf(stderr, "bfx: bit_len = %ld to long.\n", bit_len);
+            cerr << "bfx: bit_len = " << bit_len << " is too long.\n";
         }
         return -3;
     }
