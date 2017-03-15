@@ -141,6 +141,8 @@
 
 #include "bfix.hpp"
 
+const bool DEBUG = true;
+
 /*
  *==================================================================================================
  *     bfi()
@@ -216,13 +218,19 @@ bfi
 
     if ( bit_offset < 1 )
     {
-        fprintf(stderr, "bfi: arg #2, bit_offset = %ld is < 1.\n", bit_offset);
+        if ( DEBUG == true )
+        {
+            fprintf(stderr, "bfi: arg #2, bit_offset = %ld is < 1.\n", bit_offset);
+        }
         return -1;
     }
 
     if ( bit_len < 1 )
     {
-        fprintf(stderr, "bfi: arg #3, bit_len = %ld is < 1.\n", bit_len);
+        if ( DEBUG == true )
+        {
+            fprintf(stderr, "bfi: arg #3, bit_len = %ld is < 1.\n", bit_len);
+        }
         return -1;
     }
 
@@ -240,7 +248,10 @@ bfi
 
     if ( bit_len > (BITS_PER_LONG-pre_shift) )
     {
-        fprintf(stderr, "bfi: arg #3, bit_len = %ld to long.\n", bit_len);
+        if ( DEBUG == true )
+        {
+            fprintf(stderr, "bfi: arg #3, bit_len = %ld to long.\n", bit_len);
+        }
         return -1;
     }
 
@@ -269,28 +280,13 @@ bfi
     /* move BYTES_PER_LONG bytes to tmp storage */
     memmove((unsigned char *)&l, &cptr[byte_offset], BYTES_PER_LONG);
 
-    if ( endian == 1 )
+    switch ( endian )
     {
-    }
-    else if ( endian == 2 )
-    {
-        size = sizeof(l);
-        for ( i=0 ; i < size/2; i++ )
-        {
-            j = size - i - 1;
-            tmp = c[i];
-            c[i] = c[j];
-            c[j] = tmp;
-        }
-    }
-    else
-    {
-        m = l;
-        l = 1;
-        if (c[0])
-        {
+        case 1:
+            /* big endian */
+            break;
+        case 2:
             /* little endian */
-            l = m;
             size = sizeof(l);
             for ( i=0 ; i < size/2; i++ )
             {
@@ -299,39 +295,42 @@ bfi
                 c[i] = c[j];
                 c[j] = tmp;
             }
-        }
-        else
-        {
-            /* big endian */
-            l = m;
-        }
+            break;
+        case 0:
+            /* run time checking */
+            m = l;
+            l = 1;
+            if (c[0])
+            {
+                /* little endian */
+                l = m;
+                size = sizeof(l);
+                for ( i=0 ; i < size/2; i++ )
+                {
+                    j = size - i - 1;
+                    tmp = c[i];
+                    c[i] = c[j];
+                    c[j] = tmp;
+                }
+            }
+            else
+            {
+                /* big endian */
+                l = m;
+            }
+            break;
     }
 
     /* zero out bit field bits and then or value bits into them */
     l = (l & (~mask)) | value;
 
-    if ( endian == 1 )
+    switch ( endian )
     {
-    }
-    else if ( endian == 2 )
-    {
-        size = sizeof(l);
-        for ( i=0 ; i < size/2; i++ )
-        {
-            j = size - i - 1;
-            tmp = c[i];
-            c[i] = c[j];
-            c[j] = tmp;
-        }
-    }
-    else
-    {
-        m = l;
-        l = 1;
-        if (c[0])
-        {
+        case 1:
+            /* big endian */
+            break;
+        case 2:
             /* little endian */
-            l = m;
             size = sizeof(l);
             for ( i=0 ; i < size/2; i++ )
             {
@@ -340,12 +339,30 @@ bfi
                 c[i] = c[j];
                 c[j] = tmp;
             }
-        }
-        else
-        {
-            /* big endian */
-            l = m;
-        }
+            break;
+        case 0:
+            /* run time checking */
+            m = l;
+            l = 1;
+            if (c[0])
+            {
+                /* little endian */
+                l = m;
+                size = sizeof(l);
+                for ( i=0 ; i < size/2; i++ )
+                {
+                    j = size - i - 1;
+                    tmp = c[i];
+                    c[i] = c[j];
+                    c[j] = tmp;
+                }
+            }
+            else
+            {
+                /* big endian */
+                l = m;
+            }
+            break;
     }
 
     /* move tmp storage back to cptr array */
@@ -415,13 +432,19 @@ bfx
 
     if ( bit_offset < 1 )
     {
-        fprintf(stderr, "bfx: arg #2, bit_offset < 1.\n");
+        if ( DEBUG == true )
+        {
+            fprintf(stderr, "bfx: arg #2, bit_offset < 1.\n");
+        }
         return -1;
     }
 
     if ( bit_len < 1 )
     {
-        fprintf(stderr, "bfx: arg #3, bit_len < 1.\n");
+        if ( DEBUG == true )
+        {
+            fprintf(stderr, "bfx: arg #3, bit_len < 1.\n");
+        }
         return -2;
     }
 
@@ -439,7 +462,10 @@ bfx
 
     if ( bit_len > (BITS_PER_LONG-left_shift) )
     {
-        fprintf(stderr, "bfx: arg #3, bit_len to long.\n");
+        if ( DEBUG == true )
+        {
+            fprintf(stderr, "bfx: arg #3, bit_len to long.\n");
+        }
         return -3;
     }
 
@@ -449,31 +475,14 @@ bfx
      */
     right_shift = BITS_PER_LONG - bit_len;
 
-    /* move BYTES_PER_LONG bytes to tmp storage */
-    if ( endian == 1 )
+    switch ( endian )
     {
-        /* compiled in big endian */
-        memmove((unsigned char *)&l, &cptr[byte_offset], BYTES_PER_LONG);
-    }
-    else if ( endian == 2 )
-    {
-        /* compiled in little endian */
-        memmove((unsigned char *)&l, &cptr[byte_offset], BYTES_PER_LONG);
-        size = sizeof(l);
-        for ( i=0 ; i < size/2; i++ )
-        {
-            j = size - i - 1;
-            tmp = c[i];
-            c[i] = c[j];
-            c[j] = tmp;
-        }
-    }
-    else
-    {
-        /* compiled in run time endian checking */
-        l = 1;
-        if (c[0])
-        {
+        case 1:
+            /* big endian */
+            /* move BYTES_PER_LONG bytes to tmp storage */
+            memmove((unsigned char *)&l, &cptr[byte_offset], BYTES_PER_LONG);
+            break;
+        case 2:
             /* little endian */
             memmove((unsigned char *)&l, &cptr[byte_offset], BYTES_PER_LONG);
             size = sizeof(l);
@@ -484,12 +493,29 @@ bfx
                 c[i] = c[j];
                 c[j] = tmp;
             }
-        }
-        else
-        {
-            /* big endian */
-            memmove((unsigned char *)&l, &cptr[byte_offset], BYTES_PER_LONG);
-        }
+            break;
+        case 0:
+            /* run time checking */
+            l = 1;
+            if (c[0])
+            {
+                /* little endian */
+                memmove((unsigned char *)&l, &cptr[byte_offset], BYTES_PER_LONG);
+                size = sizeof(l);
+                for ( i=0 ; i < size/2; i++ )
+                {
+                    j = size - i - 1;
+                    tmp = c[i];
+                    c[i] = c[j];
+                    c[j] = tmp;
+                }
+            }
+            else
+            {
+                /* big endian */
+                memmove((unsigned char *)&l, &cptr[byte_offset], BYTES_PER_LONG);
+            }
+            break;
     }
 
     /*

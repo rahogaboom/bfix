@@ -1,4 +1,12 @@
 ```
+ bfix-1.0.3.tar.gz - changes related to:
+     a. API change - add endian argument and get ride of endian defines.
+     b. do error checking all the time
+     c. return more meaningful error codes
+     d. do printing only on DEBUG = true
+     e. for design/development use clang++(5.0) - verify with g++ on release
+     f. use LLVM scan-build for static analysis
+
  bfix-1.0.2.tar.gz - changes related to:
      a. add HISTORY.md file
      b. update license to Boost Software License, Version 1.0.
