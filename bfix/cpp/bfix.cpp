@@ -163,6 +163,7 @@ const bool DEBUG = true;
  *     bit_offset < 1     - error, return -1
  *     bit_len < 1        - error, return -2
  *     bit_len > too long - error, return -3
+ *     endian not 0-2     - error, return -4
  *     return 0           - success
  *
  * Parameters:
@@ -211,7 +212,7 @@ bfi
 
     BYTES_PER_LONG = sizeof(unsigned long);
     BITS_PER_LONG = BYTES_PER_LONG * BITS_PER_BYTE;
-    for ( i=0 ; i<BYTES_PER_LONG ; i++ )
+    for ( i=0 ; i < BYTES_PER_LONG ; i++ )
     {
        ((unsigned char *)&mask)[i] = 0xff;
     }
@@ -220,7 +221,7 @@ bfi
     {
         if ( DEBUG == true )
         {
-            fprintf(stderr, "bfi: arg #2, bit_offset = %ld is < 1.\n", bit_offset);
+            fprintf(stderr, "bfi: bit_offset = %ld is < 1.\n", bit_offset);
         }
         return -1;
     }
@@ -229,9 +230,9 @@ bfi
     {
         if ( DEBUG == true )
         {
-            fprintf(stderr, "bfi: arg #3, bit_len = %ld is < 1.\n", bit_len);
+            fprintf(stderr, "bfi: bit_len = %ld is < 1.\n", bit_len);
         }
-        return -1;
+        return -2;
     }
 
     /*
@@ -250,9 +251,9 @@ bfi
     {
         if ( DEBUG == true )
         {
-            fprintf(stderr, "bfi: arg #3, bit_len = %ld to long.\n", bit_len);
+            fprintf(stderr, "bfi: bit_len = %ld to long.\n", bit_len);
         }
-        return -1;
+        return -3;
     }
 
     /*
@@ -319,6 +320,14 @@ bfi
                 l = m;
             }
             break;
+
+        default:
+            if ( DEBUG == true )
+            {
+                fprintf(stderr, "bfi: endian = %d not 0-2.\n", endian);
+            }
+            return -4;
+            break;
     }
 
     /* zero out bit field bits and then or value bits into them */
@@ -363,6 +372,9 @@ bfi
                 l = m;
             }
             break;
+
+        default:
+            break;
     }
 
     /* move tmp storage back to cptr array */
@@ -388,11 +400,11 @@ bfi
  *     long value = bfx(cptr, bit_offset, bit_len, endian);
  *
  * Returns:
- *     bfx():
- *         bit_offset < 1     - error, return -1
- *         bit_len < 1        - error, return -2
- *         bit_len > too long - error, return -3
- *         return bit field   - success
+ *     bit_offset < 1     - error, return -1
+ *     bit_len < 1        - error, return -2
+ *     bit_len > too long - error, return -3
+ *     endian not 0-2     - error, return -4
+ *     return bit field   - success
  *
  * Parameters:
  *     const unsigned char *cptr - const pointer to unsigned char array
@@ -434,7 +446,7 @@ bfx
     {
         if ( DEBUG == true )
         {
-            fprintf(stderr, "bfx: arg #2, bit_offset < 1.\n");
+            fprintf(stderr, "bfx: bit_offset = %ld is < 1.\n", bit_offset);
         }
         return -1;
     }
@@ -443,7 +455,7 @@ bfx
     {
         if ( DEBUG == true )
         {
-            fprintf(stderr, "bfx: arg #3, bit_len < 1.\n");
+            fprintf(stderr, "bfx: bit_len = %ld is < 1.\n", bit_len);
         }
         return -2;
     }
@@ -464,7 +476,7 @@ bfx
     {
         if ( DEBUG == true )
         {
-            fprintf(stderr, "bfx: arg #3, bit_len to long.\n");
+            fprintf(stderr, "bfx: bit_len = %ld to long.\n", bit_len);
         }
         return -3;
     }
@@ -482,6 +494,7 @@ bfx
             /* move BYTES_PER_LONG bytes to tmp storage */
             memmove((unsigned char *)&l, &cptr[byte_offset], BYTES_PER_LONG);
             break;
+
         case 2:
             /* little endian */
             memmove((unsigned char *)&l, &cptr[byte_offset], BYTES_PER_LONG);
@@ -494,6 +507,7 @@ bfx
                 c[j] = tmp;
             }
             break;
+
         case 0:
             /* run time checking */
             l = 1;
@@ -516,12 +530,20 @@ bfx
                 memmove((unsigned char *)&l, &cptr[byte_offset], BYTES_PER_LONG);
             }
             break;
+
+        default:
+            if ( DEBUG == true )
+            {
+                fprintf(stderr, "bfx: endian = %d not 0-2.\n", endian);
+            }
+            return -4;
+            break;
     }
 
     /*
      * clear bits above bit field, right justify bit
      * field, and return this value
      */
-    return (l << left_shift) >> right_shift;
+    return ( (l << left_shift) >> right_shift );
 }
 
