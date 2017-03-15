@@ -15,6 +15,7 @@ A Generic API for Bit Manipulation in C/C++
 
 API:
 
+```
 /*
  *==================================================================================================
  *
@@ -59,19 +60,21 @@ API:
  * Error Handling
  *
  *     1. Exceptions - None
- *     2. Debugging  - define DEBUG for debugging output
+ *     2. Debugging  - const int DEBUG = true for debugging output
  *     3. Returns
  *
  *            bfi():
  *                bit_offset < 1     - error, return -1
  *                bit_len < 1        - error, return -2
  *                bit_len > too long - error, return -3
+ *                endian not 0-2     - error, return -4
  *                return 0           - success
  *
  *            bfx():
  *                bit_offset < 1     - error, return -1
  *                bit_len < 1        - error, return -2
  *                bit_len > too long - error, return -3
+ *                endian not 0-2     - error, return -4
  *                return bit field   - success
  *
  *==================================================================================================
