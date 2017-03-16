@@ -89,7 +89,7 @@
  *                bit_len < 1        - error, return -2
  *                bit_len > too long - error, return -3
  *                endian not 0-2     - error, return -4
- *                return bit field   - success
+ *                return value       - success
  *
  *==================================================================================================
  *
@@ -103,26 +103,25 @@
  *        but in a case in which the start bit is not at the beginning of a byte, then the
  *        bit_len can only extend until the end of the 4/8'th byte.  if the start bit is the
  *        last bit of a byte this will limit bit_len to 25/57 bits - the last bit of the first
- *        byte plus the next 3/7 bytes.  a bit_len of zero is ok - with bfx() returning 0 and
- *        bfi() inserting nothing.
+ *        byte plus the next 3/7 bytes.
  *
- *     3. bit_offset+bit_len should not overrun the array.
- *
- *     4. value should not be too long to fit into the bit field.  if it is, the high order bits
- *        in front of the low order bit_len bits will be truncated.
- *
- *     5. all bit_len bits will be set and no bit outside the bit field will be changed.
- *
- *     6. value may be negative and prefix 2's complement sign bits are truncated to fit into
- *        bit_len bits.
- *
- *     7. 4(32 bit machines)/8(64 bit machines) bytes are always read from the unsigned char
+ *     3. 4(32 bit machines)/8(64 bit machines) bytes are always read from the unsigned char
  *        array, modified and then written back.  this means that if you set the last bit of
  *        the array, then the next 3/7 bytes will be read and written back, thus seemingly
  *        overrunning the array.  if the 4/8 bytes does not overrun the array then no bits
  *        beyond the end of the array will be changed.  if the 4/8 bytes does overrun the
  *        array some provision must be made to deal with this possibility.  the array could
  *        be padded by 3/7 extra bytes.
+ *
+ *     4. bit_offset+bit_len should not overrun the array.
+ *
+ *     5. value should not be too long to fit into the bit field.  if it is, the high order bits
+ *        in front of the low order bit_len bits will be truncated.
+ *
+ *     6. all bit_len bits will be set and no bit outside the bit field will be changed.
+ *
+ *     7. value may be negative and prefix 2's complement sign bits are truncated to fit into
+ *        bit_len bits.
  *
  *     8. use the lscpu cmd to determine 32/64 bit and endianness:
  *        $ lscpu
@@ -140,13 +139,10 @@
 
 #include <cstring>
 #include <cstdio>
-#include <iostream>
 
 #include "bfix.hpp"
 
-using std::cerr;
-
-const bool DEBUG = true;
+const bool DEBUG = false;
 
 /*
  *==================================================================================================
@@ -200,11 +196,10 @@ bfi
 {
     /* machine dependencies */
     const unsigned int BITS_PER_BYTE = 8;
-    unsigned int BYTES_PER_LONG;
-    unsigned int BITS_PER_LONG;
+    unsigned int BYTES_PER_LONG = sizeof(unsigned long);
+    unsigned int BITS_PER_LONG = BYTES_PER_LONG * BITS_PER_BYTE;
 
-    unsigned long l;
-    unsigned long m;
+    unsigned long l, m;
     unsigned int i, j, size;
     unsigned char* c = (unsigned char*)&l;
     unsigned char tmp;
@@ -215,18 +210,16 @@ bfi
     unsigned long post_shift;
 
 
-    BYTES_PER_LONG = sizeof(unsigned long);
-    BITS_PER_LONG = BYTES_PER_LONG * BITS_PER_BYTE;
     for ( i=0 ; i < BYTES_PER_LONG ; i++ )
     {
-       ((unsigned char *)&mask)[i] = 0xff;
+        ((unsigned char *)&mask)[i] = 0xff;
     }
 
     if ( bit_offset < 1 )
     {
         if ( DEBUG == true )
         {
-            cerr << "bfi: bit_offset = " << bit_offset << " is < 1.\n";
+            fprintf(stderr, "bfi: bit_offset = %ld is < 1.\n", bit_offset);
         }
         return -1;
     }
@@ -235,7 +228,7 @@ bfi
     {
         if ( DEBUG == true )
         {
-            cerr << "bfi: bit_len = " << bit_len << " is < 1.\n";
+            fprintf(stderr, "bfi: bit_len = %ld is < 1.\n", bit_len);
         }
         return -2;
     }
@@ -256,7 +249,7 @@ bfi
     {
         if ( DEBUG == true )
         {
-            cerr << "bfi: bit_len = " << bit_len << " is too long.\n";
+            fprintf(stderr, "bfi: bit_len = %ld is too long.\n", bit_len);
         }
         return -3;
     }
@@ -294,7 +287,7 @@ bfi
         case 2:
             /* little endian */
             size = sizeof(l);
-            for ( i=0 ; i < size/2; i++ )
+            for ( i = 0 ; i < size/2; i++ )
             {
                 j = size - i - 1;
                 tmp = c[i];
@@ -311,7 +304,7 @@ bfi
                 /* little endian */
                 l = m;
                 size = sizeof(l);
-                for ( i=0 ; i < size/2; i++ )
+                for ( i = 0 ; i < size/2; i++ )
                 {
                     j = size - i - 1;
                     tmp = c[i];
@@ -346,7 +339,7 @@ bfi
         case 2:
             /* little endian */
             size = sizeof(l);
-            for ( i=0 ; i < size/2; i++ )
+            for ( i = 0 ; i < size/2; i++ )
             {
                 j = size - i - 1;
                 tmp = c[i];
@@ -363,7 +356,7 @@ bfi
                 /* little endian */
                 l = m;
                 size = sizeof(l);
-                for ( i=0 ; i < size/2; i++ )
+                for ( i = 0 ; i < size/2; i++ )
                 {
                     j = size - i - 1;
                     tmp = c[i];
@@ -409,7 +402,7 @@ bfi
  *     bit_len < 1        - error, return -2
  *     bit_len > too long - error, return -3
  *     endian not 0-2     - error, return -4
- *     return bit field   - success
+ *     return value       - success
  *
  * Parameters:
  *     const unsigned char *cptr - const pointer to unsigned char array
@@ -431,8 +424,8 @@ bfx
 {
     /* machine dependencies */
     const unsigned int BITS_PER_BYTE = 8;
-    unsigned int BYTES_PER_LONG;
-    unsigned int BITS_PER_LONG;
+    unsigned int BYTES_PER_LONG = sizeof(unsigned long);
+    unsigned int BITS_PER_LONG = BYTES_PER_LONG * BITS_PER_BYTE;
 
     unsigned long l;
     unsigned int i, j, size;
@@ -444,14 +437,11 @@ bfx
     unsigned long right_shift;
 
 
-    BYTES_PER_LONG = sizeof(unsigned long);
-    BITS_PER_LONG = BYTES_PER_LONG * BITS_PER_BYTE;
-
     if ( bit_offset < 1 )
     {
         if ( DEBUG == true )
         {
-            cerr << "bfx: bit_offset = " << bit_offset << " is < 1.\n";
+            fprintf(stderr, "bfi: bit_offset = %ld is < 1.\n", bit_offset);
         }
         return -1;
     }
@@ -460,7 +450,7 @@ bfx
     {
         if ( DEBUG == true )
         {
-            cerr << "bfx: bit_len = " << bit_len << " is < 1.\n";
+            fprintf(stderr, "bfi: bit_len = %ld is < 1.\n", bit_len);
         }
         return -2;
     }
@@ -481,7 +471,7 @@ bfx
     {
         if ( DEBUG == true )
         {
-            cerr << "bfx: bit_len = " << bit_len << " is too long.\n";
+            fprintf(stderr, "bfi: bit_len = %ld is too long.\n", bit_len);
         }
         return -3;
     }
@@ -504,7 +494,7 @@ bfx
             /* little endian */
             memmove((unsigned char *)&l, &cptr[byte_offset], BYTES_PER_LONG);
             size = sizeof(l);
-            for ( i=0 ; i < size/2; i++ )
+            for ( i = 0 ; i < size/2; i++ )
             {
                 j = size - i - 1;
                 tmp = c[i];
@@ -521,7 +511,7 @@ bfx
                 /* little endian */
                 memmove((unsigned char *)&l, &cptr[byte_offset], BYTES_PER_LONG);
                 size = sizeof(l);
-                for ( i=0 ; i < size/2; i++ )
+                for ( i = 0 ; i < size/2; i++ )
                 {
                     j = size - i - 1;
                     tmp = c[i];

@@ -7,6 +7,7 @@ set -v
 if [ "$1" == 'clean' ]
 then
     rm -f bfix.o
+    rm -f bfix_test.o
     rm -f bfix_test
     rm -f bfix_test.results
     rm -f libbfix.a
@@ -18,14 +19,10 @@ then
 fi
 
 # pick compiler
-CC="clang++"
+CC="clang"
+#CC="clang++"
+#CC="gcc"
 #CC="g++"
-
-# pick language dialect
-#LD="c++11"
-LD="c++14"
-#LD="gnu++11"
-#LD="gnu++14"
 
 # pick debug/optimize
 O=g
@@ -35,7 +32,7 @@ O=g
 export LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH
 
 # compile
-$CC -std=$LD -$O -c -fpic -ansi -pedantic -Wall -o bfix.o bfix.cpp
+$CC -$O -c -fpic -ansi -pedantic -Wall -o bfix.o bfix.cpp
 
 # build static library
 rm -rf libbfix.a
@@ -44,12 +41,12 @@ ar ts libbfix.a
 
 # build dynamic library and set up links
 rm -rf libbfix.so.1.0.1
-$CC -std=$LD -$O -shared -Wl,-soname,libbfix.so.1 -o libbfix.so.1.0.1 bfix.o -lc
+$CC -$O -shared -Wl,-soname,libbfix.so.1 -o libbfix.so.1.0.1 bfix.o -lc
 ln -sf libbfix.so.1.0.1 libbfix.so.1
 ln -sf libbfix.so.1.0.1 libbfix.so
 
 # compile test program
-$CC -std=$LD -$O -ansi -pedantic -Wall -o bfix_test bfix_test.cpp -L. -lbfix -lm
+$CC -$O -ansi -pedantic -Wall -o bfix_test bfix_test.cpp -L. -lbfix -lm
 
 # run test program
 ./bfix_test 2> bfix_test.results
