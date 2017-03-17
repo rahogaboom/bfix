@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# C++ build script
+# build script
 
 set -v
 
@@ -18,13 +18,13 @@ then
     exit
 fi
 
-# pick compiler
+# compiler
 CC="clang"
 #CC="clang++"
 #CC="gcc"
 #CC="g++"
 
-# pick debug/optimize
+# debug/optimize
 O=g
 #O=O
 

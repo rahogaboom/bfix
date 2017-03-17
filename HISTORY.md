@@ -1,4 +1,11 @@
 ```
+ bfix-1.0.4.tar.gz - changes related to:
+     a. improve test suite - add tests for all error conditions
+     b. cerr -> fprintf() to restore compilation with gcc/clang
+     c. the LLVM 4.0.0 scan-build program is used for static analysis
+     d. no language dialects - too many incompatable combinations 
+     e. many doc and minor code changes to bfix.cpp
+
  bfix-1.0.3.tar.gz - changes related to:
      a. API change - add endian argument and get ride of endian defines
      b. do error checking all the time

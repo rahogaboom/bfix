@@ -12,6 +12,3 @@
 
 6. in the build script adjust the CC variable to change the compiler - clang/gcc/clang++/g++
 
-
-no language dialects - too many incompatable combinations - will doc releases with compiler versions
-note Fedora system built on
