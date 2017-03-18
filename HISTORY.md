@@ -1,4 +1,7 @@
 ```
+ bfix-1.0.5.tar.gz - changes related to:
+     a. minor code and doc changes
+
  bfix-1.0.4.tar.gz - changes related to:
      a. improve test suite - add tests for all error conditions
      b. cerr -> fprintf() to restore compilation with gcc/clang
