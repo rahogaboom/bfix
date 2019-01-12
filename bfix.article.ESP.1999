@@ -108,7 +108,7 @@ and c. either single or multiple bit macro defines.  Examples of each follow.
 This struct defines how bitfields are normally specified and illustrates the syntactic complexity of C's
 bitfield usage.  Bitfield types may be signed int, unsigned int, or "plain" int.  Unsigned ints are
 straightforward, signed ints are not.  It is implementation-dependent as to weather the >> shift
-operator shifts 0's or 1's in from the left.  For "plain" ints the implementor may use signed, unsigned,
+operator shifts 0's or 1's in from the left.  For "plain" ints the implementer may use signed, unsigned,
 or "pseudo-signed" (contains only unsigned value but the usual unary conversions apply as if signed).
 Unnamed bitfields may be specified to provide padding between named bitfields.  The contents of the pad
 bits cannot be initialized or used at run time.  Thus, if the structure is to be output, there is no

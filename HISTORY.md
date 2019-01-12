@@ -1,4 +1,8 @@
 ```
+
+ bfix-1.0.6.tar.gz - changes related to:
+     a. 
+
  bfix-1.0.5.tar.gz - changes related to:
      a. minor code and doc changes
 
@@ -49,8 +53,5 @@
         versioning.  in future, releases will be versioned.
      b. see article at www.embedded.com:
         http://www.embedded.com/design/other/4219600/A-Generic-API-for-Bit-Manipulation-in-C
-
- Why are there no releases beyond the latest three on GitHub?  For now, I only intend to
- maintain and answer questions about the most recent releases.  This may change in future.
 
 ```
