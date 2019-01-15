@@ -1,5 +1,8 @@
 ```
 
+Library:
+    bfix.hpp
+
 A Generic API for Bit Manipulation in C/C++
 
     - insert(bfi()) or extract(bfx()) bit fields from an unsigned char array of arbitrary length
@@ -8,35 +11,53 @@ A Generic API for Bit Manipulation in C/C++
 
     - big endian, little endian or run time checking
 
+    - a C++ header file only library
+
+    - simple library, two routines bfi()(insert bit field) and bfx()(extract bit field)
+
+    - no library dependencies(except standard header files)
+
     - offset bit numbers are from 1(start of array) to unlimited
 
-    - compiles with clang++/g++
+    - verification tests that show code usage examples, see bfix_test.cpp
 
-    - bit fields inserted/extracted can be from <=32/64 to 25/57 bits in length depending
-      on the offset bit number from the beginning of the array(see bfix.cpp Note 2 for details)
+    - see cut/paste Examples section and API(bfi(), bfx()) section below
+
+    - a bfix-compile.tar file is provided with a non-header compiled(clang, clang++, gcc, g++) version
+
+    - compiles with clang++/g++
 
     - see article in Embedded Systems Programming, Jul. 1999,
       "A Generic API for Bit Manipulation in C"(included)
 
-    - caveat: always make the unsigned char array 3(32 bit machines) or 7(64 bit machines) bytes
-      longer to prevent read/write of bits beyond the logical end of array
-      (see bfix.cpp Note 3 for details)
+    - this file is the entire documentation needed to use the library
+
+    - Author: Richard Hogaboom, richard.hogaboom@gmail.com
 
 Usage:
 
 Files:
+
+    bfix-compile.tar - non-header compiled(clang, clang++, gcc, g++) version
+    bfix.doc         - documentation for library
+    bfix.hpp         - header only C++ implementation
+    bfix.mk          - build script, compiles/executes test code
+    bfix_test.cpp    - test code
 
 Examples:
 
 API:
 
 /*
- *==================================================================================================
+ * File: bfix.hpp
  *
- * File Name:
- *     bfix.cpp
+ *     Based on article in Embedded Systems Programming, Jul. 1999,
+ *     "A Generic API for Bit Manipulation in C" by Richard Hogaboom
  *
- *==================================================================================================
+ * Description:
+ *
+ *     bfi()/bfx() are used to insert and extract bit fields from an arbitrary length array
+ *     of unsigned chars pointed to by an unsigned char* pointer.
  *
  * Functions:
  *
@@ -62,16 +83,7 @@ API:
  *         )
  *         e.g. long value = bfx(cptr, bit_offset, bit_len, endian);
  *
- *==================================================================================================
- *
- * Description:
- *
- *     bfi()/bfx() are used to insert and extract bit fields from an arbitrary length array
- *     of unsigned chars pointed to by an unsigned char* pointer.
- *
- *==================================================================================================
- *
- * Error Handling
+ * Error Handling:
  *
  *     1. Exceptions - None
  *     2. Debugging  - const int DEBUG = true for debugging output
@@ -90,8 +102,6 @@ API:
  *                bit_len > too long - error, return -3
  *                endian not 0-2     - error, return -4
  *                return value       - success
- *
- *==================================================================================================
  *
  * Notes:
  *     1.  in the following notes any annotation of the form n/m means n for 32 bit systems and
@@ -134,12 +144,9 @@ API:
  *     10. since bit_offset is unsigned long it cannot have negative values - however no
  *         check for too large is done
  *
- *==================================================================================================
- *
  * Author: Richard Hogaboom
  *         richard.hogaboom@gmail.com
  *
- *==================================================================================================
  */
 
 ```

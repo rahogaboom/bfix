@@ -1,6 +1,6 @@
 
 /*
- * Test and example code for bfix(bfi()/bfx()) bit field insert/extract project and libraries
+ * test and example code for bfi()/bfx() bit field insert/extract library
  */
 
 #include <string>
