@@ -1,5 +1,8 @@
 ```
 
+ bfix-1.0.7.tar.gz -
+     a. doc changes
+
  bfix-1.0.6.tar.gz -
      a. minor code changes
      b. remove LLVM 4.0.0 scan-build program used for static analysis
