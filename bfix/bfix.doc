@@ -257,6 +257,4 @@ bfx
         unsigned int endian
     )
 
-#endif
-
 ```
